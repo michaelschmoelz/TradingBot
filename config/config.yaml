@@ -1,0 +1,48 @@
+# Parameter gespiegelt aus REGELWERK.md v0.5 (2026-09-01).
+# Quelle der Wahrheit ist das REGELWERK im Projektordner — Regeländerungen nur als neue
+# Version dort plus Eintrag in ENTSCHEIDUNGEN.md, danach hier nachziehen.
+
+capital:
+  total_usd: 10000        # Regelwerk §7
+  core_usd: 7500          # Kern-Topf (Alpaca Paper)
+  satellite_usd: 2500     # Satellit-Topf (eToro Demo)
+
+core:                     # Regelwerk §2
+  instrument: SPY
+  cash_instrument: BIL
+  sma_months: 10
+  schedule: first_trading_day_of_month
+
+satellite:                # Regelwerk §3
+  top_k: 50
+  quality_filter:
+    min_history_months: 24
+    max_drawdown_pct: 20
+    max_risk_score: 6
+    require_active_copiers: true
+  consensus:
+    min_traders_n: 5
+    window_trading_days: 3
+  excluded_broad_index_etfs: [SPY, VOO, IVV, VTI, QQQ, IWM]
+
+risk:                     # Regelwerk §4–§6
+  risk_per_trade_pct: 1.0
+  max_position_pct: 10.0
+  max_open_positions: 10
+  max_sector_pct: 30.0
+  atr_period: 14
+  stop_atr_mult: 2.5
+  trailing_atr_mult: 3.0
+  time_stop_trading_days: 30
+  circuit_breaker_drawdown_pct: 12.0
+
+etoro:
+  base_url: https://public-api.etoro.com
+  mode: demo              # NUR demo, bis Michel Echtgeld ausdrücklich freigibt
+  rate_limit_per_60s: 60
+  # Endpunkt für den Smoke-Test; exakten Pfad ggf. an die API-Referenz anpassen
+  # (api-portal.etoro.com → API Reference)
+  smoke_endpoint: /api/v1/rankings
+
+alpaca:
+  base_url: https://paper-api.alpaca.markets
