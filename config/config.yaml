@@ -40,9 +40,8 @@ etoro:
   base_url: https://public-api.etoro.com
   mode: demo              # NUR demo, bis Michel Echtgeld ausdrücklich freigibt
   rate_limit_per_60s: 60
-  # Endpunkt für den Smoke-Test; exakten Pfad ggf. an die API-Referenz anpassen
-  # (api-portal.etoro.com → API Reference)
-  smoke_endpoint: /api/v1/rankings
+  # Endpunkt für den Smoke-Test (verifiziert 2026-09-06); weitere Pfade: api-portal.etoro.com
+  smoke_endpoint: /api/v1/market-data/instruments
 
 alpaca:
   base_url: https://paper-api.alpaca.markets
