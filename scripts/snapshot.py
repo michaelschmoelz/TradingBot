@@ -21,7 +21,8 @@ from tradingbot.config import load_config, require_env
 from tradingbot.etoro_client import EtoroClient
 
 RANK_FIELDS = ["cid", "username", "gain", "riskScore", "copiers", "winRatio",
-               "peakToValley", "trades", "aumValue", "lastActivity", "popularInvestor"]
+               "peakToValley", "trades", "aumValue", "lastActivity", "popularInvestor",
+               "type", "subType"]
 POS_FIELDS = ["positionId", "instrumentId", "isBuy", "leverage", "investmentPct", "openTimestamp"]
 
 
@@ -66,21 +67,33 @@ def main() -> int:
         (out / "rankings.json").write_text(json.dumps(
             [{k: r.get(k) for k in RANK_FIELDS} for r in top], indent=1))
 
-        # 3) Live-Portfolios der Top-K (dediziertes Limit 60/60s -> Pacing)
+        # 3) Live-Portfolios der Top-K — empirisch ~30 Requests/Minute, mit 429-Backoff
+        def fetch_portfolio(username, attempts=4):
+            for n in range(attempts):
+                resp = client.get(f"/api/v1/user-info/people/{username}/portfolio/live")
+                if resp.status_code == 429:
+                    wait = float(resp.headers.get("Retry-After") or 30 * (n + 1))
+                    print(f"      429 — warte {wait:.0f}s ...")
+                    time.sleep(wait)
+                    continue
+                resp.raise_for_status()
+                return resp.json()
+            raise RuntimeError(f"429 auch nach {attempts} Versuchen")
+
         portfolios = {}
         for i, r in enumerate(top, 1):
             u = r.get("username")
             if not u:
                 continue
             try:
-                pf = client.user_live_portfolio(u)
+                pf = fetch_portfolio(u)
                 positions = pf.get("positions") or []
                 portfolios[u] = [{k: p.get(k) for k in POS_FIELDS} for p in positions]
                 print(f"  [{i}/{len(top)}] {u}: {len(positions)} Positionen")
             except Exception as exc:  # noqa: BLE001 — einzelner Trader darf fehlen
                 print(f"  [{i}/{len(top)}] {u}: FEHLER {exc}")
                 portfolios[u] = None
-            time.sleep(1.1)
+            time.sleep(2.2)
         (out / "portfolios.json").write_text(json.dumps(portfolios, indent=1))
 
         # 4) Instrument-Mapping nur fuer vorkommende IDs
