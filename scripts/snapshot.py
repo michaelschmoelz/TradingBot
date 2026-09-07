@@ -56,8 +56,9 @@ def main() -> int:
 
         # 2) Clientseitiger Qualitaetsfilter (Regelwerk §3)
         def ok(r):
+            # peakToValley kommt negativ (z. B. -23.28 = 23,28 % Drawdown)
             dd = r.get("peakToValley")
-            return dd is not None and dd <= q["max_drawdown_pct"]
+            return dd is not None and abs(dd) <= q["max_drawdown_pct"]
 
         filtered = [r for r in rows if ok(r)]
         top = filtered[:top_k]
