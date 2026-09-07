@@ -7,6 +7,7 @@ Endpunkt-Pfade: siehe api-portal.etoro.com (OpenAPI-Referenz).
 
 from __future__ import annotations
 
+import time
 import uuid
 from typing import Any
 
@@ -14,7 +15,7 @@ import httpx
 
 
 class EtoroClient:
-    def __init__(self, base_url: str, api_key: str, user_key: str, timeout: float = 30.0) -> None:
+    def __init__(self, base_url: str, api_key: str, user_key: str, timeout: float = 60.0) -> None:
         self._client = httpx.Client(
             base_url=base_url,
             timeout=timeout,
@@ -25,8 +26,27 @@ class EtoroClient:
             },
         )
 
-    def get(self, path: str, params: dict[str, Any] | None = None) -> httpx.Response:
-        return self._client.get(path, params=params, headers={"x-request-id": str(uuid.uuid4())})
+    def get(self, path: str, params: dict[str, Any] | None = None,
+            attempts: int = 4) -> httpx.Response:
+        """GET mit automatischem Retry bei Timeout und 429 (Retry-After wird respektiert)."""
+        last_exc: Exception | None = None
+        for n in range(attempts):
+            try:
+                resp = self._client.get(path, params=params,
+                                        headers={"x-request-id": str(uuid.uuid4())})
+            except httpx.TimeoutException as exc:
+                last_exc = exc
+                wait = 15.0 * (n + 1)
+                print(f"      Timeout — warte {wait:.0f}s und versuche erneut ...")
+                time.sleep(wait)
+                continue
+            if resp.status_code == 429 and n < attempts - 1:
+                wait = float(resp.headers.get("Retry-After") or 30 * (n + 1))
+                print(f"      429 — warte {wait:.0f}s ...")
+                time.sleep(wait)
+                continue
+            return resp
+        raise last_exc or RuntimeError(f"GET {path}: nach {attempts} Versuchen aufgegeben")
 
     def get_json(self, path: str, params: dict[str, Any] | None = None) -> Any:
         resp = self.get(path, params=params)
