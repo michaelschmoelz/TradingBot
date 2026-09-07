@@ -2,20 +2,23 @@ name: daily
 
 on:
   workflow_dispatch: {}
-  # Cron erst aktivieren, wenn der Bot steht (1x/Handelstag nach US-Schluss, Zeiten in UTC):
-  # schedule:
-  #   - cron: "30 21 * * 1-5"
+  schedule:
+    # Taeglich nach US-Boersenschluss (21:30 UTC = 23:30 dt. Sommerzeit), Mo-Fr
+    - cron: "30 21 * * 1-5"
+
+permissions:
+  contents: write
 
 jobs:
-  smoke-test:
+  snapshot:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v6
         with:
           python-version: "3.12"
       - name: Install
-        run: pip install -e .
+        run: pip install httpx python-dotenv PyYAML
       - name: Smoke-Test (Paper/Demo, keine Orders)
         env:
           ALPACA_API_KEY_ID: ${{ secrets.ALPACA_API_KEY_ID }}
@@ -23,3 +26,15 @@ jobs:
           ETORO_API_KEY: ${{ secrets.ETORO_API_KEY }}
           ETORO_USER_KEY: ${{ secrets.ETORO_USER_KEY }}
         run: python scripts/smoke_test.py
+      - name: Tages-Snapshot (Top-K-Trader + Portfolios)
+        env:
+          ETORO_API_KEY: ${{ secrets.ETORO_API_KEY }}
+          ETORO_USER_KEY: ${{ secrets.ETORO_USER_KEY }}
+        run: python scripts/snapshot.py
+      - name: Snapshot committen
+        run: |
+          git config user.name "trading-bot-actions"
+          git config user.email "actions@users.noreply.github.com"
+          git add data/snapshots
+          git diff --cached --quiet && echo "Keine Aenderungen" || git commit -m "Tages-Snapshot $(date -u +%F) [Actions]"
+          git push
