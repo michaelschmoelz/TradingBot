@@ -44,7 +44,7 @@ def main() -> int:
                 q["period"], sort=q["sort"], page=page, pageSize=q["page_size"],
                 riskScoreMax=q["risk_score_max"], copiersMin=q["copiers_min"],
             )
-            batch = data.get("items") or data.get("rankings") or data
+            batch = data.get("results") or data.get("items") or data.get("rankings") or data
             if isinstance(batch, dict):
                 batch = batch.get("items", [])
             if not batch and page == 1:
