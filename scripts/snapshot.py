@@ -62,8 +62,12 @@ def main() -> int:
             return dd is not None and abs(dd) <= q["max_drawdown_pct"]
 
         filtered = [r for r in rows if ok(r)]
-        top = filtered[:top_k]
-        print(f"Nach Drawdown-Filter: {len(filtered)} — Top-K genommen: {len(top)}")
+        traders = [r for r in filtered if r.get("type") == "trader"][:top_k]
+        sp_k = int(sat.get("smart_portfolio_comparison_k", 0))
+        smarts = [r for r in filtered if r.get("type") == "smart-portfolio"][:sp_k]
+        top = traders + smarts
+        print(f"Nach Drawdown-Filter: {len(filtered)} — Signal-Kohorte (Trader): {len(traders)}, "
+              f"Vergleich (Smart Portfolios): {len(smarts)}")
         (out / "rankings.json").write_text(json.dumps(
             [{k: r.get(k) for k in RANK_FIELDS} for r in top], indent=1))
 

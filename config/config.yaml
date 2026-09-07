@@ -13,12 +13,13 @@ core:                     # Regelwerk §2
   sma_months: 10
   schedule: first_trading_day_of_month
 
-satellite:                # Regelwerk §3
-  top_k: 50
+satellite:                # Regelwerk §3 (v0.6: Signal nur aus echten Tradern)
+  top_k: 50                       # Signal-Kohorte: echte Trader (type=trader)
+  smart_portfolio_comparison_k: 20  # Vergleichskohorte, speist NICHT das Signal
   ranking_query:          # Abrufparameter (Analyse-Phase; Auswahlregel wird im Backtest verfeinert)
     period: LastTwoYears  # 2-Jahres-Fenster ~ Proxy für >=24 Monate Historie
     sort: "-copiers"
-    pages: 2              # 2 x 100 Zeilen holen, dann clientseitig filtern
+    pages: 3              # 3 x 100 Zeilen holen, dann clientseitig filtern (genug fuer 50 Trader + 20 SPs)
     page_size: 100
     risk_score_max: 6
     copiers_min: 1
