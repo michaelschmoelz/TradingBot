@@ -47,6 +47,9 @@ def main() -> int:
             batch = data.get("items") or data.get("rankings") or data
             if isinstance(batch, dict):
                 batch = batch.get("items", [])
+            if not batch and page == 1:
+                print("WARNUNG: unerwartetes Antwortformat, Top-Level-Keys:",
+                      list(data.keys()) if isinstance(data, dict) else type(data).__name__)
             rows.extend(batch)
             print(f"Rankings Seite {page}: {len(batch)} Zeilen")
             time.sleep(1.1)
