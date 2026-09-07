@@ -15,6 +15,14 @@ core:                     # Regelwerk §2
 
 satellite:                # Regelwerk §3
   top_k: 50
+  ranking_query:          # Abrufparameter (Analyse-Phase; Auswahlregel wird im Backtest verfeinert)
+    period: LastTwoYears  # 2-Jahres-Fenster ~ Proxy für >=24 Monate Historie
+    sort: "-copiers"
+    pages: 2              # 2 x 100 Zeilen holen, dann clientseitig filtern
+    page_size: 100
+    risk_score_max: 6
+    copiers_min: 1
+    max_drawdown_pct: 20  # clientseitig auf peakToValley angewendet
   quality_filter:
     min_history_months: 24
     max_drawdown_pct: 20
