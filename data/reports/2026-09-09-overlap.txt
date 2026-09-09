@@ -1,0 +1,39 @@
+Snapshot 2026-09-09 — 70 Portfolios geladen, 0 fehlgeschlagen
+
+### SIGNAL-KOHORTE (echte Trader): 50 Portfolios, 8864 Positionen, 925 Instrumente (long)
+Instrument                             Halter  Anteil
+Microsoft                                  29    58%
+Amazon.com Inc                             29    58%
+Meta Platforms Inc                         22    44%
+Alphabet                                   22    44%
+NVIDIA Corporation                         19    38%
+Taiwan Semiconductor Manufacturing Co      16    32%
+Micron Technology, Inc.                    15    30%
+eToro Group LTD                            15    30%
+Advanced Micro Devices Inc                 15    30%
+Apple                                      14    28%
+Bitcoin                                    13    26%
+Alibaba-ADR                                12    24%
+Novo Nordisk B A/S                         11    22%
+Berkshire Hathaway Inc                     11    22%
+Visa                                       11    22%
+Verteilung: 29x:2, 22x:2, 19x:1, 16x:1, 15x:3, 14x:1, 13x:1, 12x:1, 11x:3, 10x:3, 9x:5, 8x:5, 7x:7, 6x:9, 5x:15, 4x:32, 3x:59, 2x:140, 1x:635
+Instrumente mit >=5 Haltern: 59 | Hebel: {1: 8762, 2: 1, 5: 23, 10: 7, 20: 8}
+
+### VERGLEICH (Smart Portfolios — speist NICHT das Signal): 20 Portfolios, 1441 Positionen, 495 Instrumente (long)
+Instrument                             Halter  Anteil
+NextEra Energy Inc                          5    25%
+iShares Core S&P 500 UCITS ETF              5    25%
+Duke Energy Corp                            4    20%
+Vistra Corp                                 4    20%
+iShares MSCI Japan EUR Hedged UCITS ET      4    20%
+Chevron                                     4    20%
+Microsoft                                   3    15%
+Schneider Electric SE                       3    15%
+Exelon Corp                                 3    15%
+Southern Co                                 3    15%
+Verteilung: 5x:2, 4x:4, 3x:34, 2x:76, 1x:379
+Instrumente mit >=5 Haltern: 2 | Hebel: {1: 1439, 2: 2}
+
+Hinweis: Bestands-Ueberlapp, KEIN Einstiegssignal — das Signal zaehlt NEU
+eroeffnete Positionen binnen 3 Handelstagen (Regelwerk §3).
