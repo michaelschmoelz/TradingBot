@@ -19,6 +19,8 @@ jobs:
           python-version: "3.12"
       - name: Install
         run: pip install httpx python-dotenv PyYAML
+      - name: Unit-Tests (Signal-Logik)
+        run: pip install pytest && python -m pytest -q tests
       - name: Smoke-Test (Paper/Demo, keine Orders)
         env:
           ALPACA_API_KEY_ID: ${{ secrets.ALPACA_API_KEY_ID }}
@@ -36,6 +38,10 @@ jobs:
           mkdir -p data/reports
           python scripts/overlap_analysis.py | tee data/reports/$(date -u +%F)-overlap.txt
           { echo '```'; cat data/reports/$(date -u +%F)-overlap.txt; echo '```'; } >> "$GITHUB_STEP_SUMMARY"
+      - name: Neueinstiegs-Detektor (Regelwerk §3, keine Orders)
+        run: |
+          python scripts/entry_signals.py | tee data/reports/$(date -u +%F)-entries.txt
+          { echo '```'; cat data/reports/$(date -u +%F)-entries.txt; echo '```'; } >> "$GITHUB_STEP_SUMMARY"
       - name: Snapshot + Report committen
         run: |
           git config user.name "trading-bot-actions"

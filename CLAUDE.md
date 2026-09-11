@@ -2,7 +2,7 @@
 
 ## Zuerst lesen
 
-Quelle der Wahrheit für alle Handelsregeln: `../REGELWERK.md` (aktuell v0.6).
+Quelle der Wahrheit für alle Handelsregeln: `../REGELWERK.md` (aktuell v0.7).
 Dazu `../ENTSCHEIDUNGEN.md` (Entscheidungslog) und `../OFFENE-PUNKTE.md` (Stand).
 Architektur: `../ARCHITEKTUR.md`. Diese Dateien liegen eine Ebene über dem Repo.
 
@@ -18,8 +18,8 @@ Architektur: `../ARCHITEKTUR.md`. Diese Dateien liegen eine Ebene über dem Repo
 ## Setup & Betrieb
 
 - Python 3.12 (CI) / venv in `.venv`; Deps: httpx, python-dotenv, PyYAML (+ pandas später).
-- Smoke-Test: `python scripts/smoke_test.py` · Snapshot: `python scripts/snapshot.py` · Analyse: `python scripts/overlap_analysis.py`.
-- Nächtlicher Cron (`.github/workflows/daily.yml`, Mo–Fr 21:30 UTC): Smoke-Test → Snapshot (Top-50 Trader + Top-20 Smart Portfolios) → Overlap-Report → Commit. Vor lokaler Arbeit `git pull` (Actions committet nachts).
+- Smoke-Test: `python scripts/smoke_test.py` · Snapshot: `python scripts/snapshot.py` · Analyse: `python scripts/overlap_analysis.py` · Neueinstiege/Signal: `python scripts/entry_signals.py` · Tests: `python -m pytest -q tests`.
+- Nächtlicher Cron (`.github/workflows/daily.yml`, Mo–Fr 21:30 UTC): Smoke-Test → Snapshot (Top-50 Trader + Top-20 Smart Portfolios) → Overlap-Report → Neueinstiegs-Detektor (`data/reports/<Datum>-entries.txt/.json`) → Commit. Vor lokaler Arbeit `git pull` (Actions committet nachts).
 - eToro-API-Fallstricke (empirisch verifiziert): Header-Zuordnung siehe `.env.example`; Rankings unter `/api/v2/portfolios/rankings`, Zeilen im Feld `results`; `peakToValley` ist negativ; Portfolio-Endpunkt drosselt bei ~30 Requests/min (Client hat Backoff).
 
 ## Commit-Konventionen

@@ -1,4 +1,4 @@
-# Parameter gespiegelt aus REGELWERK.md v0.5 (2026-09-01).
+# Parameter gespiegelt aus REGELWERK.md v0.7 (2026-09-09).
 # Quelle der Wahrheit ist das REGELWERK im Projektordner — Regeländerungen nur als neue
 # Version dort plus Eintrag in ENTSCHEIDUNGEN.md, danach hier nachziehen.
 
@@ -31,8 +31,19 @@ satellite:                # Regelwerk §3 (v0.6: Signal nur aus echten Tradern)
     require_active_copiers: true
   consensus:
     min_traders_n: 5
-    window_trading_days: 3
+    window_trading_days: 3        # Fenster endet am Snapshot-Tag, Mo-Fr (US-Feiertage noch nicht beruecksichtigt)
+    min_weight_pct: 0.1           # Mindest-Gesamtgewicht je Trader/Instrument (Summe investmentPct) gegen Staub-Positionen; Startwert 2026-09-09
+    counting_variant: A           # A = nur erster Kauf zaehlt (Nachkaeufe nicht); B/C nur im Backtest
+  universe:                       # Regelwerk §3: US-Aktien/ETFs, keine CFD-only-Instrumente
+    type_ids: [5, 6]              # eToro typeId: 5 Aktie, 6 ETF (10 Krypto, 1 Forex, 4 Index-CFD raus)
+    exchange_ids: [4, 5]          # eToro exchangeId: 4 NASDAQ, 5 NYSE
   excluded_broad_index_etfs: [SPY, VOO, IVV, VTI, QQQ, IWM]
+  excluded_broad_index_etf_names:  # instruments.json hat keine Symbole -> Namensmuster (case-insensitive)
+    - "S&P 500"
+    - "QQQ"
+    - "Nasdaq 100"
+    - "Total Stock Market"
+    - "Russell 2000"
 
 risk:                     # Regelwerk §4–§6
   risk_per_trade_pct: 1.0
