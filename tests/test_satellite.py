@@ -34,8 +34,19 @@ def test_window_skips_weekend():
     assert trading_days_back(date(2026, 9, 10), 3) == date(2026, 9, 8)
     # Mo 14.09.: 3 Handelstage = Do 10., Fr 11., Mo 14.
     assert trading_days_back(date(2026, 9, 14), 3) == date(2026, 9, 10)
-    # Snapshot am Samstag -> letzter Werktag zaehlt als Fensterende
+    # Snapshot am Samstag -> letzter Handelstag zaehlt als Fensterende
     assert trading_days_back(date(2026, 9, 12), 1) == date(2026, 9, 11)
+
+
+def test_window_skips_nyse_holidays():
+    # Labor Day Mo 07.09.2026: Fenster ab Di 08.09. = Do 03., Fr 04., Di 08.
+    assert trading_days_back(date(2026, 9, 8), 3) == date(2026, 9, 3)
+    # Thanksgiving Do 26.11.2026: Fenster ab Fr 27.11. = Di 24., Mi 25., Fr 27.
+    assert trading_days_back(date(2026, 11, 27), 3) == date(2026, 11, 24)
+    # Karfreitag 03.04.2026 (kein Bundesfeiertag, aber NYSE zu) -> Fenster ab Mo 06.04. = 01., 02., 06.
+    assert trading_days_back(date(2026, 4, 6), 3) == date(2026, 4, 1)
+    # Sondertag: National Day of Mourning 09.01.2025 (Carter) -> 3 Tage ab Fr 10.01. = 07., 08., 10.
+    assert trading_days_back(date(2025, 1, 10), 3) == date(2025, 1, 7)
 
 
 def test_tranches_count_once_and_oldest_wins():

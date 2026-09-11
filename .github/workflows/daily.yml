@@ -18,7 +18,7 @@ jobs:
         with:
           python-version: "3.12"
       - name: Install
-        run: pip install httpx python-dotenv PyYAML
+        run: pip install httpx python-dotenv PyYAML exchange_calendars
       - name: Unit-Tests (Signal-Logik)
         run: pip install pytest && python -m pytest -q tests
       - name: Smoke-Test (Paper/Demo, keine Orders)

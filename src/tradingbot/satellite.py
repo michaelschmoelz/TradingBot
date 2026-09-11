@@ -25,7 +25,7 @@ from __future__ import annotations
 
 from collections import defaultdict
 from dataclasses import dataclass
-from datetime import date, datetime, timedelta
+from datetime import date, datetime
 from typing import Any, Iterable
 
 
@@ -34,20 +34,35 @@ def parse_open_timestamp(ts: str) -> datetime:
     return datetime.strptime(ts[:19], "%Y-%m-%dT%H:%M:%S")
 
 
+_XNYS = None
+
+
+def _nyse():
+    """NYSE-Handelskalender (exchange_calendars 'XNYS'), lazy geladen; ab 2000 fuer den Backtest."""
+    global _XNYS
+    if _XNYS is None:
+        import exchange_calendars as xc  # Abhaengigkeit in pyproject/daily.yml
+        _XNYS = xc.get_calendar("XNYS", start="2000-01-01")
+    return _XNYS
+
+
+def last_trading_day(day: date) -> date:
+    """`day` selbst, wenn NYSE-Handelstag, sonst der letzte Handelstag davor."""
+    import pandas as pd
+    return _nyse().date_to_session(pd.Timestamp(day), direction="previous").date()
+
+
 def trading_days_back(day: date, n: int) -> date:
-    """Erster Tag eines Fensters von n Handelstagen, das mit `day` endet (Mo–Fr; Feiertage
-    werden nicht berücksichtigt — das Fenster ist dann höchstens einen Tag zu kurz)."""
+    """Erster Tag eines Fensters von n NYSE-Handelstagen, das mit `day` endet (Wochenenden und
+    US-Boersenfeiertage nach NYSE-Kalender ausgenommen; verkuerzte Handelstage zaehlen voll)."""
     if n < 1:
         raise ValueError("Fenster muss >= 1 Handelstag sein")
-    d = day
-    while d.weekday() >= 5:  # auf letzten Werktag zurück
-        d -= timedelta(days=1)
-    remaining = n - 1
-    while remaining > 0:
-        d -= timedelta(days=1)
-        if d.weekday() < 5:
-            remaining -= 1
-    return d
+    import pandas as pd
+    cal = _nyse()
+    s = cal.date_to_session(pd.Timestamp(day), direction="previous")
+    for _ in range(n - 1):
+        s = cal.previous_session(s)
+    return s.date()
 
 
 @dataclass(frozen=True)

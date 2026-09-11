@@ -31,7 +31,7 @@ satellite:                # Regelwerk §3 (v0.6: Signal nur aus echten Tradern)
     require_active_copiers: true
   consensus:
     min_traders_n: 5
-    window_trading_days: 3        # Fenster endet am Snapshot-Tag, Mo-Fr (US-Feiertage noch nicht beruecksichtigt)
+    window_trading_days: 3        # NYSE-Handelstage (exchange_calendars XNYS), Fenster endet am Snapshot-Tag
     min_weight_pct: 0.1           # Mindest-Gesamtgewicht je Trader/Instrument (Summe investmentPct) gegen Staub-Positionen; Startwert 2026-09-09
     counting_variant: A           # A = nur erster Kauf zaehlt (Nachkaeufe nicht); B/C nur im Backtest
   universe:                       # Regelwerk §3: US-Aktien/ETFs, keine CFD-only-Instrumente
