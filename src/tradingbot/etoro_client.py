@@ -62,6 +62,12 @@ class EtoroClient:
         """GET /api/v1/user-info/people/{username}/portfolio/live — dediziertes Limit 60/60s."""
         return self.get_json(f"/api/v1/user-info/people/{username}/portfolio/live")
 
+    def assets_history(self, username: str, **params: Any) -> Any:
+        """GET /api/v2/portfolios/{username}/assets/history — taegliche Allokation je Instrument
+        (investedPct/valuePct). Entweder period=... oder minDate/maxDate (YYYY-MM-DD),
+        optional count (Downsampling). 403 bei Tradern, die Statistik-Sharing abgewaehlt haben."""
+        return self.get_json(f"/api/v2/portfolios/{username}/assets/history", params or None)
+
     def instruments(self) -> Any:
         """GET /api/v1/market-data/instruments — Anzeigedaten aller Instrumente."""
         return self.get_json("/api/v1/market-data/instruments")
