@@ -4,11 +4,9 @@ Echte Neueinstiege im Universum: 6 in 6 Instrumenten von 4 Tradern (davon ausges
 Kein Kaufsignal (Maximum N=1).
 
 Instrument                               N  Trader (Einstieg, Gewicht)
-Yalla Group Limited                      1  FundManagerZech (09.09. 1.6%)
-Lockheed Martin Corporation              1  onk342 (09.09. 0.4%)
-Bristol-Myers Squibb Co                  1  plessas (10.09. 0.8%)
 Ituran Location and Control Ltd          1  plessas (09.09. 0.5%)
 Betterware De Mexico Sapi De             1  plessas (09.09. 0.9%)
+Yalla Group Limited                      1  FundManagerZech (09.09. 1.6%)
+Lockheed Martin Corporation              1  onk342 (09.09. 0.4%)
 iShares 20+ Year Treasury Bond ETF       1  Marirs (10.09. 3.8%)
-
-JSON: data/reports/2026-09-11-entries.json
+Bristol-Myers Squibb Co                  1  plessas (10.09. 0.8%)

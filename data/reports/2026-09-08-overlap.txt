@@ -1,6 +1,6 @@
-Snapshot 2026-09-08 — 70 Portfolios geladen, 0 fehlgeschlagen
+Tagesdaten 2026-09-08 — Signal-Kohorte 50 Portfolios geladen, 0 fehlgeschlagen
 
-### SIGNAL-KOHORTE (echte Trader): 50 Portfolios, 8812 Positionen, 923 Instrumente (long)
+### SIGNAL-KOHORTE (echte Trader): 50 Portfolios, 8753 Positionen, 923 Instrumente (long)
 Instrument                             Halter  Anteil
 Microsoft                                  29    58%
 Amazon.com Inc                             29    58%
@@ -18,7 +18,7 @@ Novo Nordisk B A/S                         11    22%
 Berkshire Hathaway Inc                     11    22%
 Netflix, Inc.                              11    22%
 Verteilung: 29x:2, 22x:2, 19x:1, 16x:1, 15x:3, 14x:1, 13x:1, 12x:1, 11x:4, 10x:2, 9x:6, 8x:5, 7x:6, 6x:9, 5x:14, 4x:34, 3x:58, 2x:138, 1x:635
-Instrumente mit >=5 Haltern: 58 | Hebel: {1: 8718, 2: 1, 5: 22, 10: 5, 20: 7}
+Instrumente mit >=5 Haltern: 58 | Hebel: {'1': 8718, '2': 1, '5': 22, '10': 5, '20': 7}
 
 ### VERGLEICH (Smart Portfolios — speist NICHT das Signal): 20 Portfolios, 1428 Positionen, 496 Instrumente (long)
 Instrument                             Halter  Anteil
@@ -33,7 +33,7 @@ Entergy Corp                                3    15%
 Exelon Corp                                 3    15%
 Schneider Electric SE                       3    15%
 Verteilung: 5x:2, 4x:4, 3x:34, 2x:76, 1x:380
-Instrumente mit >=5 Haltern: 2 | Hebel: {1: 1426, 2: 2}
+Instrumente mit >=5 Haltern: 2 | Hebel: {'1': 1426, '2': 2}
 
 Hinweis: Bestands-Ueberlapp, KEIN Einstiegssignal — das Signal zaehlt NEU
 eroeffnete Positionen binnen 3 Handelstagen (Regelwerk §3).

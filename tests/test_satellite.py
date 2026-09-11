@@ -6,8 +6,10 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))
 
+from tradingbot.daily import cohort_stats, derive_entries  # noqa: E402
 from tradingbot.satellite import (Membership, UniverseRule, consensus,  # noqa: E402
-                                  detect_entries, parse_open_timestamp, trading_days_back)
+                                  detect_entries, filter_entries, parse_open_timestamp,
+                                  trading_days_back)
 
 UNI = UniverseRule(type_ids=frozenset({5, 6}), exchange_ids=frozenset({4, 5}),
                    excluded_name_patterns=("s&p 500", "qqq"))
@@ -90,3 +92,28 @@ def test_membership_excludes_brought_in_positions():
     assert detect_entries(pf, INS, UNI, date(2026, 9, 8), 0.1, m) == []   # aeltester Kauf vorher
     pf = {"b": [pos(1, "2026-09-11T10:00:00Z")]}
     assert len(detect_entries(pf, INS, UNI, date(2026, 9, 9), 0.1, m)) == 1
+
+
+def test_derived_records_match_live_detection():
+    """Gespeicherte Neueinstiege (daily.derive_entries) liefern dieselben Signale wie die
+    Live-Erkennung — und enthalten keine Portfolio-Rohdaten."""
+    pf = {t: [pos(1, "2026-09-09T10:00:00Z"), pos(3, "2026-09-09T10:00:00Z"),
+              pos(2, "2020-01-01T10:00:00Z")] for t in "abcde"}
+    recs = derive_entries(pf, INS, date(2026, 9, 1))
+    assert {r["instrumentId"] for r in recs} == {1, 3}          # alte Position 2 nicht im Lookback
+    assert set(recs[0]) == {"trader", "instrumentId", "name", "typeId", "exchangeId",
+                            "firstOpen", "weightPct"}
+    live = detect_entries(pf, INS, UNI, date(2026, 9, 8), 0.1)
+    stored = filter_entries(recs, UNI, date(2026, 9, 8), 0.1)
+    assert sorted(live, key=str) == sorted(stored, key=str)
+    assert list(consensus(stored, 5)) == [1]
+    st = cohort_stats(pf)
+    assert st["portfolios"] == 5 and st["holders_by_instrument"]["1"] == 5
+    raw = json_text(st) + json_text(recs)
+    for field in ("openTimestamp", "positionId", "investmentPct", "isBuy"):
+        assert field not in raw                                 # keine Rohdaten-Felder
+
+
+def json_text(obj):
+    import json
+    return json.dumps(obj)

@@ -4,5 +4,3 @@ Echte Neueinstiege im Universum: 0 in 0 Instrumenten von 0 Tradern (davon ausges
 Kein Kaufsignal (Maximum N=0).
 
 Instrument                               N  Trader (Einstieg, Gewicht)
-
-JSON: data/reports/2026-09-07-entries.json

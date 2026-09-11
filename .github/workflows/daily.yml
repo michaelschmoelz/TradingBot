@@ -28,24 +28,17 @@ jobs:
           ETORO_API_KEY: ${{ secrets.ETORO_API_KEY }}
           ETORO_USER_KEY: ${{ secrets.ETORO_USER_KEY }}
         run: python scripts/smoke_test.py
-      - name: Tages-Snapshot (Top-K-Trader + Portfolios)
+      - name: Tageslauf (Kohorte, Live-Portfolios nur im Speicher, abgeleitete Daten + Reports)
         env:
           ETORO_API_KEY: ${{ secrets.ETORO_API_KEY }}
           ETORO_USER_KEY: ${{ secrets.ETORO_USER_KEY }}
-        run: python scripts/snapshot.py
-      - name: Ueberschneidungsanalyse als Report
         run: |
-          mkdir -p data/reports
-          python scripts/overlap_analysis.py | tee data/reports/$(date -u +%F)-overlap.txt
-          { echo '```'; cat data/reports/$(date -u +%F)-overlap.txt; echo '```'; } >> "$GITHUB_STEP_SUMMARY"
-      - name: Neueinstiegs-Detektor (Regelwerk §3, keine Orders)
-        run: |
-          python scripts/entry_signals.py | tee data/reports/$(date -u +%F)-entries.txt
-          { echo '```'; cat data/reports/$(date -u +%F)-entries.txt; echo '```'; } >> "$GITHUB_STEP_SUMMARY"
-      - name: Snapshot + Report committen
+          python scripts/daily_run.py
+          { echo '```'; cat data/reports/$(date -u +%F)-overlap.txt; echo; cat data/reports/$(date -u +%F)-entries.txt; echo '```'; } >> "$GITHUB_STEP_SUMMARY"
+      - name: Tagesdaten + Reports committen
         run: |
           git config user.name "trading-bot-actions"
           git config user.email "actions@users.noreply.github.com"
-          git add data/snapshots data/reports
-          git diff --cached --quiet && echo "Keine Aenderungen" || git commit -m "Tages-Snapshot + Overlap-Report $(date -u +%F) [Actions]"
+          git add data/daily data/reports
+          git diff --cached --quiet && echo "Keine Aenderungen" || git commit -m "Tagesdaten + Reports $(date -u +%F) [Actions]"
           git push

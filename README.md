@@ -39,5 +39,5 @@ config/config.yaml        Parameter (gespiegelt aus REGELWERK v0.5)
 src/tradingbot/           Module: Config, eToro-/Alpaca-Client, Kern, Satellit, Trade-Log
 scripts/smoke_test.py     Verbindungstest beider APIs
 .github/workflows/        GitHub-Actions-Gerüst (manuell auslösbar; Cron erst später)
-data/                     State/Snapshots (SQLite/Parquet) — Backtest-Rohmaterial
+data/daily, data/reports  Abgeleitete Tagesdaten und Reports (keine Rohdaten fremder Trader)
 ```

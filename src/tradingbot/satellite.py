@@ -87,9 +87,9 @@ class UniverseRule:
     def allows(self, meta: dict[str, Any] | None) -> bool:
         if not meta:
             return False
-        if int(meta.get("typeId", -1)) not in self.type_ids:
+        if int(meta.get("typeId") or -1) not in self.type_ids:
             return False
-        if int(meta.get("exchangeId", -1)) not in self.exchange_ids:
+        if int(meta.get("exchangeId") or -1) not in self.exchange_ids:
             return False
         name = str(meta.get("name", "")).lower()
         return not any(p in name for p in self.excluded_name_patterns)
@@ -175,6 +175,30 @@ def detect_entries(
         if membership is not None and not membership.was_member(trader, opened.date()):
             continue
         out.append(Entry(trader, iid, opened, pct))
+    return out
+
+
+def filter_entries(
+    records: Iterable[dict[str, Any]],
+    universe: UniverseRule,
+    window_start: date,
+    min_weight_pct: float,
+    membership: Membership | None = None,
+) -> list[Entry]:
+    """Wie detect_entries, aber auf den gespeicherten, bereits je (Trader, Instrument)
+    aggregierten Neueinstiegen aus data/daily/*.json (Felder wie daily.derive_entries)."""
+    out: list[Entry] = []
+    for r in records:
+        opened = datetime.fromisoformat(r["firstOpen"])
+        pct = float(r.get("weightPct") or 0.0)
+        if opened.date() < window_start or pct < min_weight_pct:
+            continue
+        if not universe.allows({"typeId": r.get("typeId"), "exchangeId": r.get("exchangeId"),
+                                "name": r.get("name")}):
+            continue
+        if membership is not None and not membership.was_member(r["trader"], opened.date()):
+            continue
+        out.append(Entry(r["trader"], int(r["instrumentId"]), opened, pct))
     return out
 
 
