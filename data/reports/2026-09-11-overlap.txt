@@ -1,6 +1,6 @@
 Tagesdaten 2026-09-11 — Signal-Kohorte 50 Portfolios geladen, 0 fehlgeschlagen
 
-### SIGNAL-KOHORTE (echte Trader): 50 Portfolios, 8327 Positionen, 911 Instrumente (long)
+### SIGNAL-KOHORTE (echte Trader): 50 Portfolios, 8328 Positionen, 912 Instrumente (long)
 Instrument                             Halter  Anteil
 Microsoft                                  29    58%
 Amazon.com Inc                             29    58%
@@ -17,8 +17,8 @@ Alibaba-ADR                                12    24%
 Novo Nordisk B A/S                         11    22%
 Berkshire Hathaway Inc                     11    22%
 Netflix, Inc.                              10    20%
-Verteilung: 29x:2, 22x:2, 18x:1, 16x:1, 15x:2, 14x:1, 13x:2, 12x:1, 11x:2, 10x:2, 9x:6, 8x:5, 7x:7, 6x:10, 5x:14, 4x:29, 3x:61, 2x:134, 1x:629
-Instrumente mit >=5 Haltern: 58 | Hebel: {1: 8292, 2: 1, 5: 21, 10: 7, 20: 6}
+Verteilung: 29x:2, 22x:2, 18x:1, 16x:1, 15x:2, 14x:1, 13x:2, 12x:1, 11x:2, 10x:2, 9x:6, 8x:5, 7x:7, 6x:10, 5x:14, 4x:29, 3x:61, 2x:133, 1x:631
+Instrumente mit >=5 Haltern: 58 | Hebel: {1: 8293, 2: 1, 5: 21, 10: 7, 20: 6}
 
 ### VERGLEICH (Smart Portfolios — speist NICHT das Signal): 20 Portfolios, 1444 Positionen, 496 Instrumente (long)
 Instrument                             Halter  Anteil
@@ -28,8 +28,8 @@ Vistra Corp                                 4    20%
 Duke Energy Corp                            4    20%
 iShares MSCI Japan EUR Hedged UCITS ET      4    20%
 Chevron                                     4    20%
-Intesa Sanpaolo Group                       3    15%
 Bank of America Corp                        3    15%
+Intesa Sanpaolo Group                       3    15%
 Eaton Corp PLC                              3    15%
 Entergy Corp                                3    15%
 Verteilung: 5x:2, 4x:4, 3x:34, 2x:77, 1x:379
