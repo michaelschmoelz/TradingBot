@@ -6,8 +6,10 @@ Ausgabe: Textreport auf stdout + data/reports/YYYY-MM-DD-entries.json (maschinen
          fuer Dashboard/Backtest). Idempotent: gleicher Snapshot -> gleiche Dateien.
 
 Zaehlt nur echte Neueinstiege je (Trader, Instrument) — Tranchen/Nachkaeufe sind kein
-Signal. Meldet ein KAUFSIGNAL, wenn >= N Trader der Signal-Kohorte dasselbe Instrument
-im Fenster neu eroeffnet haben. Es werden KEINE Orders ausgeloest.
+Signal — und nur von Tradern, die am Vortag der Eroeffnung bereits in der Kohorte waren
+(Regelwerk v0.8; Mitgliedschaft aus den rankings.json aller Snapshots bis zum Stichtag).
+Meldet ein KAUFSIGNAL, wenn >= N Trader der Signal-Kohorte dasselbe Instrument im Fenster
+neu eroeffnet haben. Es werden KEINE Orders ausgeloest.
 """
 
 from __future__ import annotations
@@ -21,9 +23,23 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))
 
 from tradingbot.config import load_config
-from tradingbot.satellite import UniverseRule, consensus, detect_entries, trading_days_back
+from tradingbot.satellite import (Membership, UniverseRule, consensus, detect_entries,
+                                  trading_days_back)
 
 REPO = Path(__file__).resolve().parents[1]
+
+
+def load_membership(snaps: Path, until: date) -> Membership:
+    """Kohorten-Mitgliedschaft aus allen Snapshots bis einschliesslich `until`."""
+    hist = {}
+    for d in sorted(p for p in snaps.iterdir() if p.is_dir()):
+        try:
+            day = date.fromisoformat(d.name)
+        except ValueError:
+            continue
+        if day <= until and (d / "rankings.json").exists():
+            hist[day] = json.loads((d / "rankings.json").read_text())
+    return Membership.from_rankings(hist)
 
 
 def pick_snapshot(arg: str | None) -> Path:
@@ -54,7 +70,10 @@ def main() -> int:
     types = {r.get("username"): r.get("type") for r in rankings}
     cohort = {u: ps for u, ps in portfolios.items() if ps is not None and types.get(u) == "trader"}
 
-    entries = detect_entries(cohort, instruments, universe, start, min_w)
+    membership = load_membership(day.parent, snap_date)
+    entries = detect_entries(cohort, instruments, universe, start, min_w, membership)
+    unfiltered = detect_entries(cohort, instruments, universe, start, min_w)
+    brought_in = len(unfiltered) - len(entries)
     hits = consensus(entries, n_min)
     per_inst = Counter(e.instrument_id for e in entries)
     name = lambda iid: instruments.get(str(iid), {}).get("name") or f"ID {iid}"  # noqa: E731
@@ -62,7 +81,8 @@ def main() -> int:
     print(f"Neueinstiege {day.name} — Fenster {start} bis {snap_date} ({window} Handelstage), "
           f"Kohorte {len(cohort)} Trader, Schwelle N>={n_min}, Mindestgewicht {min_w} %")
     print(f"Echte Neueinstiege im Universum: {len(entries)} in {len(per_inst)} Instrumenten "
-          f"von {len({e.trader for e in entries})} Tradern")
+          f"von {len({e.trader for e in entries})} Tradern"
+          f" (davon ausgeschlossen als Bestand vor Kohorteneintritt: {brought_in})")
 
     if hits:
         print(f"\n*** KAUFSIGNAL ({len(hits)}) ***")
@@ -86,6 +106,7 @@ def main() -> int:
         "params": {"min_traders_n": n_min, "window_trading_days": window, "min_weight_pct": min_w,
                    "counting_variant": sat["consensus"].get("counting_variant", "A")},
         "cohort_size": len(cohort),
+        "excluded_pre_membership": brought_in,
         "signals": [{"instrumentId": iid, "name": name(iid), "n": len(es),
                      "traders": [e.trader for e in es]} for iid, es in hits.items()],
         "entries": [{"trader": e.trader, "instrumentId": e.instrument_id, "name": name(e.instrument_id),

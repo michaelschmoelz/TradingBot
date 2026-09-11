@@ -6,8 +6,8 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))
 
-from tradingbot.satellite import (UniverseRule, consensus, detect_entries,  # noqa: E402
-                                  parse_open_timestamp, trading_days_back)
+from tradingbot.satellite import (Membership, UniverseRule, consensus,  # noqa: E402
+                                  detect_entries, parse_open_timestamp, trading_days_back)
 
 UNI = UniverseRule(type_ids=frozenset({5, 6}), exchange_ids=frozenset({4, 5}),
                    excluded_name_patterns=("s&p 500", "qqq"))
@@ -63,3 +63,19 @@ def test_consensus_threshold():
     assert len(es) == 5
     assert list(consensus(es, 5)) == [1]
     assert consensus(es, 6) == {}
+
+
+def test_membership_excludes_brought_in_positions():
+    rk = lambda *names: [{"username": n, "type": "trader"} for n in names]  # noqa: E731
+    m = Membership.from_rankings({date(2026, 9, 7): rk("a"), date(2026, 9, 8): rk("a"),
+                                  date(2026, 9, 10): rk("a", "b")})
+    # a: seit 07.09. dabei -> Eroeffnung ab 08.09. zaehlt, am 07.09. selbst noch nicht
+    assert m.was_member("a", date(2026, 9, 8)) and not m.was_member("a", date(2026, 9, 7))
+    # b: erstmals im Snapshot 10.09. -> Eroeffnungen bis 10.09. sind Bestand, ab 11.09. Signal
+    assert not m.was_member("b", date(2026, 9, 10)) and m.was_member("b", date(2026, 9, 11))
+    # Luecke (kein Snapshot 09.09.): letzter Snapshot davor gilt
+    assert m.was_member("a", date(2026, 9, 9)) and not m.was_member("b", date(2026, 9, 9))
+    pf = {"b": [pos(1, "2026-09-09T10:00:00Z"), pos(1, "2026-09-11T10:00:00Z")]}
+    assert detect_entries(pf, INS, UNI, date(2026, 9, 8), 0.1, m) == []   # aeltester Kauf vorher
+    pf = {"b": [pos(1, "2026-09-11T10:00:00Z")]}
+    assert len(detect_entries(pf, INS, UNI, date(2026, 9, 9), 0.1, m)) == 1

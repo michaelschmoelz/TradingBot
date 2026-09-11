@@ -2,7 +2,7 @@
 
 ## Zuerst lesen
 
-Quelle der Wahrheit für alle Handelsregeln: `../REGELWERK.md` (aktuell v0.7).
+Quelle der Wahrheit für alle Handelsregeln: `../REGELWERK.md` (aktuell v0.8).
 Dazu `../ENTSCHEIDUNGEN.md` (Entscheidungslog) und `../OFFENE-PUNKTE.md` (Stand).
 Architektur: `../ARCHITEKTUR.md`. Diese Dateien liegen eine Ebene über dem Repo.
 

@@ -1,5 +1,5 @@
 Neueinstiege 2026-09-11 — Fenster 2026-09-09 bis 2026-09-11 (3 Handelstage), Kohorte 50 Trader, Schwelle N>=5, Mindestgewicht 0.1 %
-Echte Neueinstiege im Universum: 6 in 6 Instrumenten von 4 Tradern
+Echte Neueinstiege im Universum: 6 in 6 Instrumenten von 4 Tradern (davon ausgeschlossen als Bestand vor Kohorteneintritt: 0)
 
 Kein Kaufsignal (Maximum N=1).
 

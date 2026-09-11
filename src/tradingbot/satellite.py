@@ -16,6 +16,9 @@ Neueinstiegs-Detektor (Entscheidung 2026-09-09, OFFENE-PUNKTE):
 - Nur Long (isBuy=true), Hebel egal (Regelwerk v0.7).
 - Universum: Aktien/ETFs an US-Börsen; breite Index-ETFs ausgeschlossen.
 - Mindest-Gewicht je (Trader, Instrument) gegen Staub-Positionen.
+- Kohorten-Mitgliedschaft (Regelwerk v0.8): ein Neueinstieg zählt nur, wenn der Trader am
+  letzten Snapshot-Tag vor dem Eröffnungstag in der Signal-Kohorte war. Mitgebrachte
+  Positionen neuer Mitglieder sind Bestand, kein Signal.
 """
 
 from __future__ import annotations
@@ -105,19 +108,56 @@ def aggregate_holdings(
     return agg
 
 
+class Membership:
+    """Kohorten-Mitgliedschaft je Snapshot-Tag (Regelwerk v0.8), abgeleitet aus rankings.json
+    aller Snapshots: {Tag: {Trader, ...}}."""
+
+    def __init__(self, by_day: dict[date, set[str]]):
+        if not by_day:
+            raise ValueError("Mitgliedschaftshistorie ist leer")
+        self._days = sorted(by_day)
+        self._by_day = by_day
+
+    @classmethod
+    def from_rankings(cls, rankings_by_day: dict[date, list[dict[str, Any]]]) -> "Membership":
+        return cls({d: {r["username"] for r in rows if r.get("type") == "trader"}
+                    for d, rows in rankings_by_day.items()})
+
+    def was_member(self, trader: str, on: date) -> bool:
+        """Mitglied am letzten Snapshot-Tag VOR `on` (strikt: der Snapshot des Eröffnungstags
+        selbst zählt nicht, weil die Position auch vor dem Eintritt an diesem Tag eröffnet sein
+        kann). Vor dem ersten Snapshot: nie Mitglied — Positionen vor Beobachtungsbeginn sind
+        Bestand."""
+        ref = None
+        for d in self._days:
+            if d < on:
+                ref = d
+            else:
+                break
+        return ref is not None and trader in self._by_day[ref]
+
+
 def detect_entries(
     portfolios: dict[str, list[dict[str, Any]] | None],
     instruments: dict[str, dict[str, Any]],
     universe: UniverseRule,
     window_start: date,
     min_weight_pct: float,
+    membership: Membership | None = None,
 ) -> list[Entry]:
-    """Neueinstiege im Fenster [window_start, ∞) nach Regelwerk §3 (Zählvariante A)."""
+    """Neueinstiege im Fenster [window_start, ∞) nach Regelwerk §3 (Zählvariante A).
+
+    Mit `membership` gilt zusätzlich v0.8: nur Einstiege, bei denen der Trader zum
+    Eröffnungszeitpunkt bereits Kohortenmitglied war. Ohne `membership` (None) wird
+    nicht gefiltert — nur für Tests/Analysen, nicht für den Signalbetrieb.
+    """
     out: list[Entry] = []
     for (trader, iid), (opened, pct) in aggregate_holdings(portfolios).items():
         if opened.date() < window_start or pct < min_weight_pct:
             continue
         if not universe.allows(instruments.get(str(iid))):
+            continue
+        if membership is not None and not membership.was_member(trader, opened.date()):
             continue
         out.append(Entry(trader, iid, opened, pct))
     return out
